@@ -1,47 +1,41 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TimeService } from './time.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('api/v1/times')
 export class TimeController {
   constructor(private timeService: TimeService) {}
-  @Get()
-  public getWeek(): string {
-    this.timeService.getWeek({});
-    return 'hi form time asdasdasd';
-  }
 
   @Get('/weeks')
-  public getWeeks() {
+  public getAllWeeks() {
     return this.timeService.getAllWeeks();
   }
 
-  @Post()
-  public createWeek() {
-    const res = this.timeService.createWeek({
-      monday: 8,
-      tusday: 8,
-      Month: {
-        connect: {
-          id: 1,
-        },
-      },
-    });
-
-    // const month = this.timeService.createMonth({
-    //   name: 'June',
-    //   weeks: {
-    //     connect: { id: 1 },
-    //   },
-    //   year: 2022,
-    // });
-    //
-    // console.log(res);
-    // console.log(month);
-    return res;
+  @Post('/month')
+  public createMonth(@Body() month: { name: string; year: number }) {
+    return this.timeService.createMonth(month);
   }
 
   @Get('/months')
-  public getMonths() {
-    return this.timeService.getAllMonths();
+  public getAllMonths() {
+    return this.timeService.getAllMonthsWithWeeks();
+  }
+
+  @Patch('/month/:month/:year')
+  public addWeekToMonth(
+    @Param('month') month: string,
+    @Param('year') year: string,
+    @Body()
+    weekData: Prisma.WeekCreateInput,
+  ) {
+    return this.timeService.addWeekToMonth(month, parseInt(year), weekData);
+  }
+
+  @Get('/month/:month/:year')
+  public getMonthByName(
+    @Param('month') month: string,
+    @Param('year') year: string,
+  ) {
+    return this.timeService.findMonthByNameAndYear(month, parseInt(year), true);
   }
 }

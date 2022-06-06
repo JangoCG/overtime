@@ -29,12 +29,12 @@ model Post {
 model Week {
   id         Int    @id @default(autoincrement())
   monday     Float?
-  tusday     Float?
+  tuesday    Float?
   wednesday  Float?
   thursday   Float?
   friday     Float?
   totalHours Float?
-  Month      Month? @relation(fields: [monthId], references: [id])
+  month      Month? @relation(fields: [monthId], references: [id])
   monthId    Int? // relation scalar field  (used in the `@relation` attribute above)
 }
 
