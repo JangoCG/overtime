@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TimeService } from './time.service';
 import { Prisma } from '@prisma/client';
+import { MonthDto } from '../../model/dto/MonthDto';
 
 @Controller('api/v1/times')
 export class TimeController {
@@ -12,7 +13,7 @@ export class TimeController {
   }
 
   @Post('/month')
-  public createMonth(@Body() month: { name: string; year: number }) {
+  public createMonth(@Body() month: MonthDto) {
     return this.timeService.createMonth(month);
   }
 

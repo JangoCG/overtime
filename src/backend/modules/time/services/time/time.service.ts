@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/services';
-import { Prisma, Week, Month } from '@prisma/client';
+import { Month, Prisma, Week } from '@prisma/client';
+import { MonthDto } from '../../model/dto/MonthDto';
 
 @Injectable()
 export class TimeService {
@@ -16,8 +17,30 @@ export class TimeService {
     return this.prisma.week.findUnique({ where: weekWhereUniqueInput });
   }
 
-  public createMonth(data: Prisma.MonthCreateInput) {
-    return this.prisma.month.create({ data });
+  public createMonth(month: MonthDto) {
+    const monthMap = new Map<number, string>([
+      [1, 'January'],
+      [2, 'February'],
+      [3, 'March'],
+      [4, 'April'],
+      [5, 'May'],
+      [6, 'June'],
+      [7, 'July'],
+      [8, 'August'],
+      [9, 'September'],
+      [10, 'October'],
+      [11, 'November'],
+      [12, 'December'],
+    ]);
+
+    const monthName: string = monthMap.get(month.monthIndex);
+    console.log(monthName);
+    const monthToCreate: Prisma.MonthCreateInput = {
+      name: monthName,
+      year: 2022,
+    };
+
+    return this.prisma.month.create({ data: monthToCreate });
   }
 
   public getAllWeeks() {

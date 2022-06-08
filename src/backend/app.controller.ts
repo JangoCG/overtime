@@ -10,7 +10,7 @@ import {
 import { AppService } from './app.service';
 import { UserService } from './prisma-example/user-service/user-service.service';
 import { PostService } from './prisma-example/post/post.service';
-import { User as UserModel, Post as PostModel } from '@prisma/client';
+import { Post as PostModel, User as UserModel } from '@prisma/client';
 
 @Controller()
 export class AppController {
