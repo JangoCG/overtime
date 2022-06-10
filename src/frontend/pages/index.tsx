@@ -6,7 +6,6 @@ import Modal from "../components/modal";
 import Table from "../components/table/table";
 import { EndPoints } from "../lib/api/axios";
 import { fetcher } from "../lib/api/fetcher";
-import { prettyJson } from "../lib/services/prettyJson";
 
 const mockMonth: MonthDto = {
   id: 21,
