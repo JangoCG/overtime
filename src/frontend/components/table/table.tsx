@@ -1,20 +1,46 @@
+import { Week } from "@prisma/client";
 import React, { Dispatch, SetStateAction, useState } from "react";
+import { async } from "rxjs";
+import { useSWRConfig } from "swr";
+import { EndPoints } from "../../lib/api/axios";
+import { addWeekToMonth } from "../../lib/services/timeService";
+import { MonthDto } from "../../pages";
 
 type TableProps = {
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  month: MonthDto;
 };
 
-function Table({ setShowModal }: TableProps) {
+function Table({ setShowModal, month }: TableProps) {
   const [show, setShow] = useState(null);
+  const { mutate } = useSWRConfig();
+
+  const removeKeysThatShouldNotBeRendered = (entry: string) => {
+    return entry !== "id" && entry !== "monthId";
+  };
+
+  const handleAddWeekToMonth = async (entry: string) => {
+    await addWeekToMonth("July");
+    mutate(`${EndPoints.time}/months`);
+  };
+
   return (
     <>
       <div className="w-full sm:px-6">
         <div className="px-4 md:px-10 py-4 md:py-7 bg-gray-100 rounded-tl-lg rounded-tr-lg">
           <div className="sm:flex items-center justify-between">
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-normal text-gray-800">
-              Time Sheet
+              {`${month.name} ${month.year}`}
             </p>
             <div>
+              <button
+                onClick={() => handleAddWeekToMonth("some string")}
+                className="inline-flex sm:ml-3 mt-4 sm:mt-0 items-start justify-start px-6 py-3 bg-black hover:bg-indigo-600 focus:outline-none rounded"
+              >
+                <p className="text-sm font-medium leading-none text-white">
+                  Add new week
+                </p>
+              </button>
               <button
                 onClick={() => setShowModal(true)}
                 className="inline-flex sm:ml-3 mt-4 sm:mt-0 items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
@@ -30,36 +56,27 @@ function Table({ setShowModal }: TableProps) {
           <table className="w-full whitespace-nowrap">
             <thead>
               <tr className="h-16 w-full text-sm leading-none text-gray-800">
-                <th className="font-normal text-left pl-4">Monday</th>
+                <th className="font-normal text-left pl-12">Monday</th>
                 <th className="font-normal text-left pl-12">Tusday</th>
                 <th className="font-normal text-left pl-12">Wednesday</th>
-                <th className="font-normal text-left pl-20">Thursday</th>
-                <th className="font-normal text-left pl-20">Friday</th>
-                <th className="font-normal text-left pl-16">Total</th>
+                <th className="font-normal text-left pl-12">Thursday</th>
+                <th className="font-normal text-left pl-12">Friday</th>
+                <th className="font-normal text-left pl-12">Total</th>
               </tr>
             </thead>
             <tbody className="w-full">
               <tr className="h-20 text-sm leading-none text-gray-800 bg-white hover:bg-gray-100 border-b border-t border-gray-200">
-                <td className="pl-4">
-                  <p className="font-medium">8h</p>
-                </td>
-                <td className="pl-12">
-                  <p className="text-sm font-medium leading-none text-gray-800">
-                    8h
-                  </p>
-                </td>
-                <td className="pl-12">
-                  <p className="font-medium">7.5h</p>
-                </td>
-                <td className="pl-20">
-                  <p className="font-medium">10h</p>
-                </td>
-                <td className="pl-20">
-                  <p className="font-medium">6h</p>
-                </td>
-                <td className="pl-16">
-                  <p className="font-medium">6h</p>
-                </td>
+                {month.weeks.map(week =>
+                  Object.keys(week)
+                    .filter(entry => removeKeysThatShouldNotBeRendered(entry))
+                    .map((day, i) => (
+                      <td className="pl-12" key={i}>
+                        <p className="font-medium">
+                          {week[day as keyof Week]}h
+                        </p>
+                      </td>
+                    ))
+                )}
                 <td className="px-7 2xl:px-0">
                   {show == 0 ? (
                     <button

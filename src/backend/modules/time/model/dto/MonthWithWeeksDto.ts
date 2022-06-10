@@ -1,7 +1,7 @@
-import { MonthDto } from './MonthDto';
+import { CreateMonthDto } from './CreateMonthDto';
 import { Week } from '@prisma/client';
 
 export interface MonthWithWeeksDto {
-  month: MonthDto;
+  month: CreateMonthDto;
   weeks: Week[];
 }

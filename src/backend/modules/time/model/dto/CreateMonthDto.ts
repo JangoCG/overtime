@@ -1,4 +1,4 @@
-export interface MonthDto {
+export interface CreateMonthDto {
   monthIndex?: number;
   year: number;
 }

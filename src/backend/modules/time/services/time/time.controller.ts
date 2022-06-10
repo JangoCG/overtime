@@ -1,19 +1,21 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TimeService } from './time.service';
-import { Prisma } from '@prisma/client';
-import { MonthDto } from '../../model/dto/MonthDto';
+import { Prisma, Week } from '@prisma/client';
+import { CreateMonthDto } from '../../model/dto/CreateMonthDto';
 
 @Controller('api/v1/times')
 export class TimeController {
   constructor(private timeService: TimeService) {}
 
   @Get('/weeks')
-  public getAllWeeks() {
+  public getAllWeeks(): Promise<Week[] | null> {
+    const test = this.timeService.getAllWeeks();
+    console.log(test);
     return this.timeService.getAllWeeks();
   }
 
   @Post('/month')
-  public createMonth(@Body() month: MonthDto) {
+  public createMonth(@Body() month: CreateMonthDto) {
     return this.timeService.createMonth(month);
   }
 

@@ -2,6 +2,8 @@
 import React, { Dispatch, Fragment, SetStateAction, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { createMonth } from "../lib/services/timeService";
+import { useSWRConfig } from "swr";
+import { EndPoints } from "../lib/api/axios";
 
 type ModalProps = {
   setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -11,10 +13,12 @@ type ModalProps = {
 export default function Modal({ showModal, setShowModal }: ModalProps) {
   const cancelButtonRef = useRef(null);
   const [month, setMonth] = useState<number>(0);
+  const { mutate } = useSWRConfig();
 
   const handleAddMonth = () => {
     createMonth(month).then(res => console.log("res", res.data));
     setShowModal(false);
+    mutate(`${EndPoints.time}/months`);
   };
 
   const handleSelectionChange = (
