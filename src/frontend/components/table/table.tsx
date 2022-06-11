@@ -1,6 +1,5 @@
 import { Week } from "@prisma/client";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { async } from "rxjs";
 import { useSWRConfig } from "swr";
 import { EndPoints } from "../../lib/api/axios";
 import { addWeekToMonth } from "../../lib/services/timeService";
@@ -23,6 +22,10 @@ function Table({ setShowModal, month }: TableProps) {
     await addWeekToMonth("July");
     mutate(`${EndPoints.time}/months`);
   };
+
+  if (!month) {
+    return <p>loading....</p>;
+  }
 
   return (
     <>
