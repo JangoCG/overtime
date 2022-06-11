@@ -1,6 +1,5 @@
-export interface MonthDto {
-  id: number;
-  name: string;
-  year: number;
-  weeks: any[];
-}
+import { Month, Week } from '@prisma/client';
+
+export type MonthDto = Month & {
+  weeks: Week[];
+};

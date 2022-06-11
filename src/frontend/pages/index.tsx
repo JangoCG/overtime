@@ -1,7 +1,7 @@
-import { Month, Week } from "@prisma/client";
 import type { NextPage } from "next";
 import { useState } from "react";
 import useSWR from "swr";
+import { MonthDto } from "../../shared/dto/MonthDto";
 import Modal from "../components/modal";
 import Table from "../components/table/table";
 import { EndPoints } from "../lib/api/axios";
@@ -24,9 +24,7 @@ const mockMonth: MonthDto = {
     }
   ]
 };
-export type MonthDto = Month & {
-  weeks: Week[];
-};
+
 const Home: NextPage = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import ActualReactTable from "../components/table/actual-react-table";
+import ActualReactTable from "./actual-react-table";
 
 const getData = () => [
   {

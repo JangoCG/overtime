@@ -10,8 +10,10 @@ const user = {
     "https://pbs.twimg.com/profile_images/1534621228081811457/h7ZkfEmB_400x400.jpg"
 };
 const navigation = [
-  { name: "Timetracking", href: "#", current: true },
-  { name: "Projects", href: "#", current: false }
+  { name: "Timetracking", href: "/", current: true },
+  { name: "React Table", href: "react-table", current: false },
+  { name: "Meine Tabelle", href: "/time-tracking", current: false }
+
   // { name: "Projects", href: "#", current: false },
   // { name: "Calendar", href: "#", current: false },
   // { name: "Reports", href: "#", current: false }
