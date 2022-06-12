@@ -4,10 +4,22 @@ import Logo from "../public/pencil.svg";
 import { MonthDto } from "../../shared/dto/MonthDto";
 import TimeTableHeader from "./time-table-header";
 import { Week } from "@prisma/client";
+import { updateWeekOfMonth } from "../lib/services/timeService";
+import { useSWRConfig } from "swr";
+import { EndPoints } from "../lib/api/axios";
+import { prettyJson } from "../lib/services/prettyJson";
 
 type TimeTableProps = {
   setShowModal?: Dispatch<SetStateAction<boolean>>;
   month: MonthDto;
+};
+
+export type WeekForm = {
+  monday: number;
+  tuesday: number;
+  wednesday: number;
+  thursday: number;
+  friday: number;
 };
 
 const TimeTable = ({ month }: TimeTableProps) => {
@@ -15,19 +27,44 @@ const TimeTable = ({ month }: TimeTableProps) => {
     return entry !== "id" && entry !== "monthId";
   };
 
+  const { mutate } = useSWRConfig();
+
   const [inEditMode, setInEditMode] = useState({
     status: false,
     rowKey: null
   });
 
-  const [unitPrice, setUnitPrice] = useState(null);
+  const [unitPrice, setUnitPrice] = useState<number>(0);
+  const [formDataState, setFormDataState] = React.useState<WeekForm>({
+    monday: 0,
+    tuesday: 0,
+    wednesday: 0,
+    thursday: 0,
+    friday: 0
+  });
 
-  const onEdit = ({ id, currentUnitPrice }) => {
+  function handleChange(evt) {
+    console.log("event", evt.target.name);
+    const value = evt.target.value;
+    setFormDataState({
+      ...formDataState,
+      [evt.target.name]: Number(value)
+    });
+  }
+
+  const onEdit = (week: Week) => {
     setInEditMode({
       status: true,
-      rowKey: id
+      rowKey: week.id
     });
-    setUnitPrice(currentUnitPrice);
+    setUnitPrice(5);
+    setFormDataState({
+      monday: week.monday || 0,
+      tuesday: week.tuesday || 0,
+      wednesday: week.wednesday || 0,
+      thursday: week.thursday || 0,
+      friday: week.friday || 0
+    });
   };
 
   /**
@@ -35,24 +72,9 @@ const TimeTable = ({ month }: TimeTableProps) => {
    * @param id
    * @param newUnitPrice
    */
-  const updateInventory = ({ id, newUnitPrice }) => {
-    fetch(`${INVENTORY_API_URL}/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        unit_price: newUnitPrice
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then(response => response.json())
-      .then(json => {
-        // reset inEditMode and unit price state values
-        onCancel();
-
-        // fetch the updated data
-        fetchInventory();
-      });
+  const updateInventory = async ({ id, newUnitPrice }) => {
+    await updateWeekOfMonth(id, formDataState);
+    mutate(`${EndPoints.time}/months`);
   };
 
   /**
@@ -72,12 +94,14 @@ const TimeTable = ({ month }: TimeTableProps) => {
     });
     // reset the unit price state value
     setUnitPrice(null);
+    setFormDataState(null);
   };
 
   return (
     <div className="flex flex-col">
       <TimeTableHeader />
       <div className="shadow border-b border-gray-200 rounded-lg">
+        <pre>{prettyJson(formDataState)}</pre>
         <table className="w-full divide-y divide-gray-200 table-fixed">
           <thead className="bg-gray-50 text-gray-500">
             <tr className="font-normal">
@@ -114,19 +138,58 @@ const TimeTable = ({ month }: TimeTableProps) => {
                   .filter(entry => removeKeysThatShouldNotBeRendered(entry))
                   .map((day, i) => (
                     <td className="px-6 py-4" key={i}>
-                      <p className="font-medium">{week[day as keyof Week]}h</p>
+                      {inEditMode.status && inEditMode.rowKey === week.id ? (
+                        <input
+                          type="number"
+                          value={formDataState[day as keyof WeekForm] || 0}
+                          name={day}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <p className="font-medium">
+                          {week[day as keyof Week]}h
+                        </p>
+                      )}
                     </td>
                   ))}
                 {/* TODO: Calculate this */}
                 <td className="px-6 py-4">5h</td>
                 <td className="px-6 py-4">
+                  {inEditMode.status && inEditMode.rowKey === week.id ? (
+                    <React.Fragment>
+                      <button
+                        className={"btn-success"}
+                        onClick={() =>
+                          onSave({ id: week.id, newUnitPrice: unitPrice })
+                        }
+                      >
+                        Save
+                      </button>
+                      <button
+                        className={"btn-secondary"}
+                        style={{ marginLeft: 8 }}
+                        onClick={() => onCancel()}
+                      >
+                        Cancel
+                      </button>
+                    </React.Fragment>
+                  ) : (
+                    <button
+                      className={"btn-primary"}
+                      onClick={() => onEdit(week)}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </td>
+                {/* <td className="px-6 py-4">
                   <IconWrapper>
                     <Logo
                       className="text-gray-600 h-5 w-auto"
                       alt="Site Title"
                     />
                   </IconWrapper>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

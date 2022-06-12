@@ -1,4 +1,5 @@
 import { useSWRConfig } from "swr";
+import { WeekForm } from "../../components/time-table";
 import api, { EndPoints } from "../api/axios";
 
 export async function createMonth(month: number) {
@@ -17,3 +18,6 @@ export const addWeekToMonth = async (monthName: string) => {
   });
 };
 
+export const updateWeekOfMonth = async (weekId: string, weekData: WeekForm) => {
+  await api.patch(`${EndPoints.time}/week/${weekId}`, weekData);
+};

@@ -86,6 +86,11 @@ export class TimeService {
     });
   }
 
+  public updateWeekOfMonth(weekId: number, data: Prisma.WeekUpdateInput) {
+    const where = { id: weekId };
+    return this.prisma.week.update({ data, where });
+  }
+
   public findMonthByNameAndYear(
     month: string,
     year: number,

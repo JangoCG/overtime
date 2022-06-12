@@ -34,6 +34,15 @@ export class TimeController {
     return this.timeService.addWeekToMonth(month, parseInt(year), weekData);
   }
 
+  @Patch('/week/:weekId')
+  public updateWeekOfMonth(
+    @Param('weekId') weekId: string,
+    @Body()
+    weekData: Prisma.WeekUpdateInput,
+  ) {
+    return this.timeService.updateWeekOfMonth(Number(weekId), weekData);
+  }
+
   @Get('/month/:month/:year')
   public getMonthByName(
     @Param('month') month: string,
